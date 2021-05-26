@@ -1,6 +1,7 @@
 html, body {
     height: 100%;
     background-color: rgb(47, 47, 47);
+    margin: 0px;
 }
 
 canvas {

@@ -3,7 +3,13 @@ import Game from './game';
 
 export default class Scene {
   
-  private readonly _subject: Array<Subject> = new Array<Subject>();
+  private readonly _subject: Array<Subject>;
+  private previous: Date;
+
+  constructor() {
+    this._subject = new Array<Subject>()
+    this.previous = new Date();
+  }
 
   add(subject: Subject): void {
     this._subject.push(subject);
@@ -20,12 +26,19 @@ export default class Scene {
 
   }
 
-  update(dt: number): void {
+  update(): void {
+    let current = new Date();
+    let elapsed = (current.getTime() - this.previous.getTime()) / 1000;
+    this.previous = current;
+
     this.processInput();
-    this._subject.forEach((subject) => subject.update(dt));
-    this.render();
+    this._subject.forEach((subject) => {
+      subject.update(elapsed);
+      subject.runAction(elapsed);
+    } );
     Game.getInstance().clear();
-    window.requestAnimationFrame(() => this.update(dt));
+    this.render();
+    window.requestAnimationFrame(() => this.update());
   }
 
   render(): void {

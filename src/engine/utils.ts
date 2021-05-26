@@ -11,12 +11,21 @@ export class Vec2 {
     return new Vec2(-this.x, -this.y);
   }
   
+  add(v2: Vec2) {
+    this.x += v2.x;
+    this.y += v2.y;
+  }
+
   plus(v2: Vec2): Vec2 {
     return new Vec2(this.x + v2.x, this.y + v2.y);
   }
 
-  sqrt(v2: Vec2): number{
+  sqrt(): number{
     return Math.sqrt(this.x*this.x + this.y*this.y);
+  }
+
+  scale(s: number): Vec2 {
+    return new Vec2(this.x*s, this.y*s);
   }
 
 }

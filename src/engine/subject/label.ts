@@ -1,6 +1,6 @@
 import Subject from '../base/subject';
 import Game from '../game';
-import { Vec2, Size } from '../ultis';
+import { Vec2, Size } from '../utils';
 export default class Label extends Subject {
   text: string;
   font: string;
@@ -8,7 +8,7 @@ export default class Label extends Subject {
   constructor(text: string) {
     super();
     this.text = text;
-    this.font = "30px Consolas";
+    this.font = '40px Gotham, Helvetica Neue, sans-serif';
   }
 
   setFont(font: string) {
@@ -20,7 +20,6 @@ export default class Label extends Subject {
   }
 
   update(dt: number): void {
-
   }
 
   render(): void {

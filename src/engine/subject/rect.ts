@@ -1,6 +1,6 @@
 import Subject from '../base/subject';
 import Game from '../game';
-import { Vec2, Size} from '../ultis';
+import { Vec2, Size} from '../utils';
 export default class Rectangle extends Subject {
   size: Size;
   

@@ -11,6 +11,8 @@ export default class Game{
   private opacity: number = 100;
   private opacityInc: boolean = false;
 
+  private isKeydown = false;
+
   private constructor(width:number, height:number) {
     this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
     this.canvas.width = width;
@@ -18,6 +20,8 @@ export default class Game{
     console.log(this.canvas.width, this.canvas.height);
     
 		this.canvas.addEventListener('click', this.clickEvent, false);
+		window.addEventListener('keydown', this.keydown, false);
+		window.addEventListener('keyup', this.keyup, false);
     this.ctx = this.canvas.getContext("2d");
 
   }
@@ -43,14 +47,46 @@ export default class Game{
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
+  private keydown = (event: any) : void => {
+    if (this.isKeydown) {
+      return;
+    }
+
+    if (event.key != ' ') {
+      return;
+    }
+
+    
+
+    this.isKeydown = true;
+    console.log("keydown", event);
+    let r = this.getRandomInt(255);
+    let g = this.getRandomInt(255);
+    let b = this.getRandomInt(255);
+
+    this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+  private keyup = (event: any) : void => {
+    if (event.key != ' ') {
+      return;
+    }
+    this.isKeydown = false;
+    console.log("keyup", event);
+    let r = this.getRandomInt(255);
+    let g = this.getRandomInt(255);
+    let b = this.getRandomInt(255);
+
+    this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
   runWithSence(scene: Scene): void {
-    scene.update(1);
+    self.requestAnimationFrame(() => scene.update());
   }
   
   clear() {
-    // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    // this.ctx.scale(1,1);
-    // this.ctx.translate(0, this.canvas.height);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   getCtx() {
