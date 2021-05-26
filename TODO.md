@@ -6,16 +6,16 @@ SETUP PLAYGROUND - Done
 
 ENGINE
 ---------------------------------------------
-Director
+Director - In progress
 
-SenceManager
+SenceManager - In progress
 
-ProcessInput
+ProcessInput - In progress
 
 Object
-  - Label
-  - Polygon
-  - Button
+  - Label - Done
+  - Polygon - In progress
+  - Button 
 
 FLAPPY BIRD
 ---------------------------------------------

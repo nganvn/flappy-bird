@@ -17,9 +17,9 @@ export default class Rectangle extends Subject {
     return this.color;
   }
 
-  update(dt: number): void {
+  // update(dt: number): void {
 
-  }
+  // }
 
   render(): void {
     let ctx = Game.getInstance().getCtx();

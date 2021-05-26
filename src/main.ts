@@ -19,13 +19,15 @@ function setup() {
 
 	let scene = new Scene();
 
-	let rectSize = size(100,100);
+	let rectSize = size(40,40);
 	let rect = new Rectangle(rectSize);
 	rect.setPosition(v2(screenSize.width/2 - rectSize.width/2, screenSize.height/2 - rectSize.height/2));
 	
 	let jumpAction = Action.jumpBy(v2(0, -200), 2);
 	let moveAction = Action.moveBy(v2(0, -200), 0.5);
-	rect.addAction(new Sequence(jumpAction, moveAction));
+	// rect.addAction(new Sequence(jumpAction, moveAction));
+	rect.setVelocity(v2(0,-300));
+	rect.addForce(v2(0, 800));
 
 	let hello = new Label("Hello World");
 	hello.setPosition(rect.getPosition().plus(v2(-48, 200)));
