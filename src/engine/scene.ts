@@ -26,7 +26,7 @@ export default class Scene {
 
   }
 
-  update(): void {
+  update(dt: number): void {
     let current = new Date();
     let elapsed = (current.getTime() - this.previous.getTime()) / 1000;
     this.previous = current;
@@ -36,12 +36,17 @@ export default class Scene {
       subject.update(elapsed);
       subject.runAction(elapsed);
     } );
-    Game.getInstance().clear();
+    this.clear();
     this.render();
-    window.requestAnimationFrame(() => this.update());
+    window.requestAnimationFrame(() => this.update(dt));
   }
 
-  render(): void {
+  private render(): void {
     this._subject.forEach((subject) => subject.render());
+  }
+
+  private clear(): void {
+    let canvas = Game.getInstance().getCanvas();
+    Game.getInstance().getCtx().clearRect(0, 0, canvas.width, canvas.height);
   }
 }

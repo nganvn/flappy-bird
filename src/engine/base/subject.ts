@@ -68,6 +68,10 @@ export default abstract class Subject {
     this.force.add(f);
   }
 
+  setForce(f: Vec2) {
+    this.force = f;
+  }
+
   getForce(): Vec2 {
     return this.force;
   }

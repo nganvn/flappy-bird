@@ -9,12 +9,12 @@ export default class Rectangle extends Subject {
     this.size = size;
   }
 
-  setColor(color: string): void {
-    this.color = color;
+  setSize(size: Size) {
+    this.size = size;
   }
 
-  getColor(): string {
-    return this.color;
+  getSize(): Size {
+    return this.size;
   }
 
   // update(dt: number): void {

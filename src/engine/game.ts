@@ -17,13 +17,7 @@ export default class Game{
     this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
     this.canvas.width = width;
     this.canvas.height = height;
-    console.log(this.canvas.width, this.canvas.height);
-    
-		this.canvas.addEventListener('click', this.clickEvent, false);
-		window.addEventListener('keydown', this.keydown, false);
-		window.addEventListener('keyup', this.keyup, false);
     this.ctx = this.canvas.getContext("2d");
-
   }
 
   public static getInstance(): Game{
@@ -37,56 +31,8 @@ export default class Game{
     return Math.floor(Math.random() * max);
   }
 
-  private clickEvent = (event: any) : void => {
-    console.log("Click");
-    let r = this.getRandomInt(255);
-    let g = this.getRandomInt(255);
-    let b = this.getRandomInt(255);
-
-    this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-  }
-
-  private keydown = (event: any) : void => {
-    if (this.isKeydown) {
-      return;
-    }
-
-    if (event.key != ' ') {
-      return;
-    }
-
-    
-
-    this.isKeydown = true;
-    console.log("keydown", event);
-    let r = this.getRandomInt(255);
-    let g = this.getRandomInt(255);
-    let b = this.getRandomInt(255);
-
-    this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-  }
-  private keyup = (event: any) : void => {
-    if (event.key != ' ') {
-      return;
-    }
-    this.isKeydown = false;
-    console.log("keyup", event);
-    let r = this.getRandomInt(255);
-    let g = this.getRandomInt(255);
-    let b = this.getRandomInt(255);
-
-    this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-  }
-
   runWithSence(scene: Scene): void {
-    self.requestAnimationFrame(() => scene.update());
-  }
-  
-  clear() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    self.requestAnimationFrame(() => scene.update(0));
   }
 
   getCtx() {
