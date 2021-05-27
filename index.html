@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=0.92, user-scalable=no">
+<meta name="viewport" content="width=device-width, user-scalable=no">
 <meta name="title" content="Flappy Bird">
 <meta name=”description” content="Flappy Bird">
 
@@ -9,6 +9,24 @@
 	<canvas id="canvas"></canvas>
 <script type="text/javascript" src="bundle.js"></script></body>
 
-<script></script>
+<script>
+(function() {
+    var canvas = document.getElementById('canvas'),
+            context = canvas.getContext('2d');
+
+    // resize the canvas to fill browser window dynamically
+    window.addEventListener('resize', resizeCanvas, false);
+
+    function resizeCanvas() {
+						if (window.innerWidth/window.innerHeight < 9/16) {
+							canvas.style.width = "100%";
+						} else {
+							canvas.style.height = "100%";
+						}
+    }
+    resizeCanvas();
+})();
+
+</script>
 
 </html>
