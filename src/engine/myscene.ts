@@ -5,6 +5,7 @@ import Scene from './scene';
 import { size, v2, Vec2 } from './utils';
 import Rectangle from './subject/rect';
 import Label from './subject/label';
+import Sprite from './subject/sprite';
 
 enum GameState {
 	Await = 0,
@@ -13,14 +14,14 @@ enum GameState {
 }
 
 class CONSTANT {
-  public static readonly PIPEDELAY = 1400;
+  public static readonly PIPEDELAY = 1600;
 }
 
 
 export default class MyScene extends Scene {
   private background: Rectangle;
   private ground: Rectangle;
-  private grass: Rectangle;
+  private ground1: Rectangle;
 
   private helper: Label;
 
@@ -42,6 +43,7 @@ export default class MyScene extends Scene {
   private _addCloud: NodeJS.Timeout;
   private _play: () => void;
   private _endGame: () => void;
+  private scale: number = 800/512;
 
   constructor() {
     super();
@@ -55,27 +57,26 @@ export default class MyScene extends Scene {
     
     this.ctx = game.getCtx();
     this.canvas = game.getCanvas()
+    this.gameState = GameState.Await;
 
   }
 
   initAwaitScreen() {
     let canvas = this.canvas;
-    this.background = new Rectangle(size(canvas.width, canvas.height));
-    this.background.setColor('rgb(153, 209, 209)');
+    this.background = new Sprite('./sprites/background-day.png');
+    this.background.scale(this.scale);
 
-    this.ground = new Rectangle(size(canvas.width, 200));
-    this.ground.setPosition(v2(0, canvas.height - 200));
-    this.ground.setColor('rgb(189, 118,79)');
+    this.ground = new Sprite('./sprites/base.png');
+    this.ground.scale(this.scale);
+    this.ground.setPosition(v2(0, canvas.height - this.ground.getSize().height));
+    this.ground1 = new Sprite('./sprites/base.png');
+    this.ground1.scale(this.scale);
+    this.ground1.setPosition(v2(this.ground.getSize().width, canvas.height - this.ground.getSize().height));
 
-    
-    this.grass = new Rectangle(size(canvas.width, 50));
-    this.grass.setPosition(v2(0, canvas.height - 200));
-    this.grass.setColor('rgb(14, 176, 55)');
-
-
-    this.bird = new Rectangle(size(32,32));
+    this.bird = new Sprite('./sprites/bluebird-upflap.png');
+    this.bird.scale(this.scale);
     this.bird.setPosition(v2(canvas.width/4, canvas.height/2 - this.bird.getSize().height/2));
-    this.bird.setColor('rgb(207, 37, 46)');
+
 
     this.helper = new Label("Tap to play");
     this.helper.setFont('60px Gotham, Helvetica Neue, sans-serif');
@@ -84,9 +85,10 @@ export default class MyScene extends Scene {
     this.helper.setName("helper");
     this.helper.setAlign('center');
 
+
     this.add(this.background, 0);
     this.add(this.ground, 10);
-    this.add(this.grass, 11);
+    this.add(this.ground1, 10);
     this.add(this.bird, 20);
     this.add(this.helper, 60);
     
@@ -107,10 +109,15 @@ export default class MyScene extends Scene {
 
     this.bird.setVelocity(v2(0,-400));
     this.bird.setForce(v2(0, 1200));
+
+    this.ground.setVelocity(v2(-150, 0));
+    this.ground1.setVelocity(v2(-150, 0));
+    
+
     this.canvas.removeEventListener('mousedown', this.play);
     this._addScore = setTimeout(this.addScore, 3300);
     this._appPipe = setTimeout(() => this.addpipe(), 1000);
-    this._addCloud = setTimeout(() => this.addCloud(), 100);
+    // this._addCloud = setTimeout(() => this.addCloud(), 100);
     this.canvas.addEventListener('mousedown', this.clickEvent);
     this.gameState = GameState.Playing;
     this.removeByName('helper');
@@ -133,11 +140,13 @@ export default class MyScene extends Scene {
       item.setVelocity(v2(0,0));
     });
 
+    this.ground.setVelocity(v2(0,0));
+    this.ground1.setVelocity(v2(0,0));
+
     clearTimeout(this._appPipe);
     clearTimeout(this._addScore);
     clearTimeout(this._addCloud);
     this.gameState = GameState.GameOver;
-    
     
     this.canvas.removeEventListener('mousedown', this.clickEvent);
     setTimeout(() => this.canvas.addEventListener('mousedown', this.replay), 1500);
@@ -188,13 +197,24 @@ export default class MyScene extends Scene {
     let g = this.randomInt(100) + 50;
     let b = this.randomInt(100) + 50;
     
-    let pipeDown = new Rectangle(size(50, 500));
-    pipeDown.setColor(`rgb(${r}, ${g}, ${b})`);
+    // let pipeDown = new Rectangle(size(50, 500));
+    // pipeDown.setColor(`rgb(${r}, ${g}, ${b})`);
+    // pipeDown.setPosition(v2(450, -380 + randx ));
+    // pipeDown.setVelocity(v2(-150, 0));
+
+    // let pipeUp = new Rectangle(size(50, 500));
+    // pipeUp.setColor(`rgb(${r}, ${g}, ${b})`);
+    // pipeUp.setPosition(v2(450, 300 + randx));
+    // pipeUp.setVelocity(v2(-150, 0));
+
+    
+    let pipeDown = new Sprite('./sprites/pipe-green-down.png');
+    pipeDown.scale(this.scale);
     pipeDown.setPosition(v2(450, -380 + randx ));
     pipeDown.setVelocity(v2(-150, 0));
 
-    let pipeUp = new Rectangle(size(50, 500));
-    pipeUp.setColor(`rgb(${r}, ${g}, ${b})`);
+    let pipeUp = new Sprite('./sprites/pipe-green-up.png');
+    pipeUp.scale(this.scale);
     pipeUp.setPosition(v2(450, 300 + randx));
     pipeUp.setVelocity(v2(-150, 0));
 
@@ -213,15 +233,15 @@ export default class MyScene extends Scene {
 
   private addCloud() {
     let randx = this.randomInt(150);
-    let cloud = new Rectangle(size(50 + this.randomInt(50), 40 + this.randomInt(30)));
-    cloud.setColor('rgb(222, 227, 226)');
+    let cloud = new Sprite('./sprites/cloud.png');
+    cloud.scale(Math.random() + 0.8)
+    // cloud.setColor('rgb(222, 227, 226)');
     cloud.setPosition(v2(450, randx ))
     
     cloud.setVelocity(v2(-75, 0));
     this.add(cloud, 1);
 
     this._cloud.push(cloud);
-
     this._addCloud = setTimeout(() => this.addCloud(), CONSTANT.PIPEDELAY*2);
 
   }
@@ -271,12 +291,19 @@ export default class MyScene extends Scene {
 
   update(dt: number) {
     if (this.gameState == GameState.Playing) {
-      if (this._cloud.length > 0 && this._cloud[0].getPosition().x < -100) {
+      if (this.ground.getPosition().x < -this.ground.getSize().width) {
+        this.ground.translate(v2(this.ground.getSize().width*2, -0));
+        let tmp = this.ground1;
+        this.ground1 = this.ground;
+        this.ground = tmp;
+      }
+
+      if (this._cloud.length > 0 && this._cloud[0].getPosition().x < -400) {
         this.remove(this._cloud[0]);
         delete this._cloud[0];
         this._cloud.splice(0,1);
       }
-      if (this._pipes.length > 0 && this._pipes[0].pipeUp.getPosition().x < -100) {
+      if (this._pipes.length > 0 && this._pipes[0].pipeUp.getPosition().x < -200) {
         this.remove(this._pipes[0].pipeUp);
         this.remove(this._pipes[0].pipeDown);
         delete this._pipes[0].pipeUp;
@@ -287,7 +314,7 @@ export default class MyScene extends Scene {
         this.endGame();
       }
     }
-    if (this.gameState == GameState.GameOver && Game.getInstance().getCanvas().height <= this.bird.getPosition().y + 220) {
+    if (this.gameState == GameState.GameOver && Game.getInstance().getCanvas().height <= this.bird.getPosition().y + 205) {
       this.bird.setForce(v2(0,0));
       this.bird.setVelocity(v2(0,0));
       

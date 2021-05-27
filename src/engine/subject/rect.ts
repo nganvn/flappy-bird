@@ -1,6 +1,6 @@
 import Subject from '../base/subject';
 import Game from '../game';
-import { Vec2, Size} from '../utils';
+import { Vec2, Size, size} from '../utils';
 export default class Rectangle extends Subject {
   size: Size;
   
@@ -15,6 +15,10 @@ export default class Rectangle extends Subject {
 
   getSize(): Size {
     return this.size;
+  }
+
+  scale(s: number) {
+    this.setSize(size(this.getSize().width * s, this.getSize().height * s));
   }
 
   // update(dt: number): void {

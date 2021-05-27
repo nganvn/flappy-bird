@@ -37,6 +37,11 @@ export default abstract class Subject {
     return this.position;
   }
 
+  translate(vec: Vec2) {
+    this.position.x += vec.x;
+    this.position.y += vec.y;
+  }
+
   setColor(color: string): void {
     this.color = color;
   }
