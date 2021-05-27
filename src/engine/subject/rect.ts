@@ -25,6 +25,15 @@ export default class Rectangle extends Subject {
     let ctx = Game.getInstance().getCtx();
     ctx.fillStyle = this.color;
     ctx.fillRect(this.position.x, this.position.y, this.size.width, this.size.height);
-  } 
+  }
+
+  checkClick(vec: Vec2): boolean {
+    let x = vec.x - this.position.x;
+    let y = vec.y - this.position.y;
+    if (x >= 0 && y >= 0 && x <= this.size.width && y <= this.size.height ) {
+      return true;
+    }
+    return false;
+  }
 
 }

@@ -32,7 +32,7 @@ export default class Game{
   }
 
   runWithSence(scene: Scene): void {
-    self.requestAnimationFrame(() => scene.update(0));
+    self.requestAnimationFrame(() => scene.start());
   }
 
   getCtx() {

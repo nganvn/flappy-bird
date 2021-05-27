@@ -1,6 +1,7 @@
 import Action from '../action/action';
 import { v2, Vec2 } from '../utils';
 export default abstract class Subject {
+  protected name: string;
   protected position: Vec2;
   protected color: string;
   protected action: Action;
@@ -8,11 +9,24 @@ export default abstract class Subject {
   protected force: Vec2;
 
   constructor() {
+    this.name = "";
     this.position = v2(0,0);
     this.color = 'black';
     this.action = null;
     this.velocity = v2(0,0);
     this.force = v2(0,0);
+  }
+
+  checkClick(vec: Vec2): boolean {
+    return false;
+  }
+
+  setName(name: string) {
+    this.name = name;
+  }
+
+  getName(): string {
+    return this.name;
   }
 
   setPosition(position: Vec2): void {
@@ -32,6 +46,7 @@ export default abstract class Subject {
   }
 
   update(dt: number): void {
+    this.position.x += this.velocity.x*dt;
     this.position.y += this.velocity.y*dt + this.force.y*dt*dt/2; 
     this.velocity.y += this.force.y*dt;
   }

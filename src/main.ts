@@ -8,7 +8,7 @@ import MyScene from './engine/myscene';
 
 function setup() {
 	let scene = new MyScene()
-	scene.setup();
+	scene.initAwaitScreen();
 	
 	Game.getInstance().runWithSence(scene);
 }
