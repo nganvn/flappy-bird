@@ -19,5 +19,8 @@
     "webpack": "^4.4.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.11.2"
+  },
+  "dependencies": {
+    "queue-typescript": "^1.0.1"
   }
 }

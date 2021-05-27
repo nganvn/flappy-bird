@@ -6,6 +6,7 @@ import { size, v2, Vec2 } from './utils';
 import Rectangle from './subject/rect';
 import Label from './subject/label';
 import Sprite from './subject/sprite';
+import Animation from './action/animation';
 
 enum GameState {
 	Await = 0,
@@ -19,20 +20,21 @@ class CONSTANT {
 
 
 export default class MyScene extends Scene {
-  private background: Rectangle;
-  private ground: Rectangle;
-  private ground1: Rectangle;
+  private background: Sprite;
+  private ground: Sprite;
+  private ground1: Sprite;
 
   private helper: Label;
 
   private score: Label;
-  private bird: Rectangle;
+  private bird: Sprite;
+  private birdAni: Animation;
   private intScore: number;
   private highScore: number;
   private isKeydown = false;
 
-  private _pipes: Array<{pipeUp: Rectangle, pipeDown: Rectangle}>;
-  private _cloud: Array<Rectangle>;
+  private _pipes: Array<{pipeUp: Sprite, pipeDown: Sprite}>;
+  private _cloud: Array<Sprite>;
 
   private ctx: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
@@ -50,8 +52,8 @@ export default class MyScene extends Scene {
     this.gameState = GameState.Await;
     this.intScore = 0;
     this.highScore = 0;
-    this._pipes = new Array<{pipeUp: Rectangle, pipeDown: Rectangle}>();
-    this._cloud = new Array<Rectangle>();
+    this._pipes = new Array<{pipeUp: Sprite, pipeDown: Sprite}>();
+    this._cloud = new Array<Sprite>();
     
     let game = Game.getInstance();
     
@@ -63,20 +65,27 @@ export default class MyScene extends Scene {
 
   initAwaitScreen() {
     let canvas = this.canvas;
-    this.background = new Sprite('./sprites/background-day.png');
+    this.background = new Sprite('./sprites/background-day.png', size(288,512));
     this.background.scale(this.scale);
 
-    this.ground = new Sprite('./sprites/base.png');
+    this.ground = new Sprite('./sprites/base.png', size(336,112));
     this.ground.scale(this.scale);
     this.ground.setPosition(v2(0, canvas.height - this.ground.getSize().height));
-    this.ground1 = new Sprite('./sprites/base.png');
+    this.ground1 = new Sprite('./sprites/base.png', size(336,112));
     this.ground1.scale(this.scale);
     this.ground1.setPosition(v2(this.ground.getSize().width, canvas.height - this.ground.getSize().height));
 
-    this.bird = new Sprite('./sprites/bluebird-upflap.png');
+    this.bird = new Sprite('./sprites/bluebird-midflap.png', size(34, 24));
     this.bird.scale(this.scale);
     this.bird.setPosition(v2(canvas.width/4, canvas.height/2 - this.bird.getSize().height/2));
 
+    let birdAnimation = new Animation();
+    birdAnimation.addFrame('./sprites/bluebird-upflap.png');
+    birdAnimation.addFrame('./sprites/bluebird-midflap.png');
+    birdAnimation.addFrame('./sprites/bluebird-downflap.png');
+    birdAnimation.timer = 0.2;
+    this.bird.addAnimation(birdAnimation);
+    this.birdAni = birdAnimation;
 
     this.helper = new Label("Tap to play");
     this.helper.setFont('60px Gotham, Helvetica Neue, sans-serif');
@@ -109,6 +118,7 @@ export default class MyScene extends Scene {
 
     this.bird.setVelocity(v2(0,-400));
     this.bird.setForce(v2(0, 1200));
+    this.birdAni.start();
 
     this.ground.setVelocity(v2(-150, 0));
     this.ground1.setVelocity(v2(-150, 0));
@@ -142,6 +152,7 @@ export default class MyScene extends Scene {
 
     this.ground.setVelocity(v2(0,0));
     this.ground1.setVelocity(v2(0,0));
+    this.birdAni.stop();
 
     clearTimeout(this._appPipe);
     clearTimeout(this._addScore);
@@ -208,12 +219,12 @@ export default class MyScene extends Scene {
     // pipeUp.setVelocity(v2(-150, 0));
 
     
-    let pipeDown = new Sprite('./sprites/pipe-green-down.png');
+    let pipeDown = new Sprite('./sprites/pipe-green-down.png', size(52,320));
     pipeDown.scale(this.scale);
     pipeDown.setPosition(v2(450, -380 + randx ));
     pipeDown.setVelocity(v2(-150, 0));
 
-    let pipeUp = new Sprite('./sprites/pipe-green-up.png');
+    let pipeUp = new Sprite('./sprites/pipe-green-up.png', size(52,320));
     pipeUp.scale(this.scale);
     pipeUp.setPosition(v2(450, 300 + randx));
     pipeUp.setVelocity(v2(-150, 0));
@@ -233,7 +244,7 @@ export default class MyScene extends Scene {
 
   private addCloud() {
     let randx = this.randomInt(150);
-    let cloud = new Sprite('./sprites/cloud.png');
+    let cloud = new Sprite('./sprites/cloud.png', size(150, 110));
     cloud.scale(Math.random() + 0.8)
     // cloud.setColor('rgb(222, 227, 226)');
     cloud.setPosition(v2(450, randx ))

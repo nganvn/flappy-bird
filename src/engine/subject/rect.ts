@@ -21,10 +21,6 @@ export default class Rectangle extends Subject {
     this.setSize(size(this.getSize().width * s, this.getSize().height * s));
   }
 
-  // update(dt: number): void {
-
-  // }
-
   render(): void {
     let ctx = Game.getInstance().getCtx();
     ctx.fillStyle = this.color;

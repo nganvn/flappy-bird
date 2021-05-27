@@ -12,6 +12,7 @@ export default class Game{
   private opacityInc: boolean = false;
 
   private isKeydown = false;
+  public readonly scale = 800/512;
 
   private constructor(width:number, height:number) {
     this.canvas = <HTMLCanvasElement>document.getElementById('canvas');

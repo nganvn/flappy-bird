@@ -3,6 +3,7 @@ import { v2, Vec2 } from '../utils';
 export default abstract class Subject {
   protected name: string;
   protected position: Vec2;
+  protected angle: number;
   protected color: string;
   protected action: Action;
   protected velocity: Vec2;
@@ -15,6 +16,7 @@ export default abstract class Subject {
     this.action = null;
     this.velocity = v2(0,0);
     this.force = v2(0,0);
+    this.angle = 0;
   }
 
   checkClick(vec: Vec2): boolean {
