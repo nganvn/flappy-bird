@@ -39,6 +39,7 @@ export default abstract class Subject {
     return this.position;
   }
 
+
   translate(vec: Vec2) {
     this.position.x += vec.x;
     this.position.y += vec.y;
@@ -50,6 +51,13 @@ export default abstract class Subject {
 
   getColor(): string {
     return this.color;
+  }
+
+  setAngle(angle: number) {
+    this.angle = angle;
+  }
+  getAngle(): number {
+    return this.angle;
   }
 
   update(dt: number): void {
@@ -67,7 +75,13 @@ export default abstract class Subject {
       this.action = null;
       return;
     }
-    this.position.add(this.action.getDtv2(dt));
+    
+    
+    if (this.action.isRotation()) {
+      this.angle += this.action.getDtAngle(dt);
+    } else {
+      this.position.add(this.action.getDtv2(dt));
+    }
   }
 
   addAction(action: Action) {

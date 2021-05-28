@@ -13,16 +13,16 @@ export default class Sequence extends Action {
 
   isEndAction(): boolean {
     if (this._actions.length) {
+      if (super.isEndAction()) {
+        let action = this._actions.splice(0,1)[0];
+        this.copy(action);
+      }
       return false;
     }
     return super.isEndAction();
   }
 
   getDtv2(dt: number): Vec2 {
-    if (super.isEndAction()) {
-      let action = this._actions.splice(0,1)[0];
-      this.copy(action);
-    }
     return super.getDtv2(dt);
   }
 }

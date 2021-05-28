@@ -20,12 +20,21 @@ export default class Sprite extends Rectangle {
   }
 
   render(): void {
+
     let ctx = Game.getInstance().getCtx();
+    ctx.save();
+    
+    ctx.translate(this.getPosition().x + this.getSize().width/2, this.getPosition().y + this.getSize().height/2);
+    ctx.rotate(Math.PI * this.angle / 180);
+
     if (this.animation && this.animation.isRunning()) {
-      ctx.drawImage(this.animation.getFrame(), this.position.x, this.position.y, this.getSize().width, this.getSize().height);
+      ctx.drawImage(this.animation.getFrame(), -this.getSize().width/2, -this.getSize().height/2, this.getSize().width, this.getSize().height);
     } else {
-      ctx.drawImage(this.image, this.position.x, this.position.y, this.getSize().width, this.getSize().height);
+      ctx.drawImage(this.image, -this.getSize().width/2, -this.getSize().height/2, this.getSize().width, this.getSize().height);
     }
+    
+
+    ctx.restore();
   }
 
   update(dt: number): void{

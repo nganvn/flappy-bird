@@ -3,9 +3,11 @@ export default class Action {
   protected vec: Vec2;
   protected timer: number;
   protected a: number;
-  
-  protected timeCount: number;
+  protected angle = 0;
+  timeCount: number;
   protected cal: () => number;
+
+  _isRotation: boolean;
 
   constructor() {
     this.vec = v2(0,0);
@@ -13,6 +15,7 @@ export default class Action {
     this.a = 0;
     this.timeCount = 0;
     this.cal = null;
+    this._isRotation = false;
   }
 
   protected copy(action: Action) {
@@ -21,6 +24,12 @@ export default class Action {
     this.a = action.a;
     this.cal = action.cal;
     this.timeCount = 0;
+    this.angle = action.angle;
+    this.isRotation = this.isRotation
+  }
+
+  isRotation(): boolean {
+    return true;
   }
 
   isEndAction(): boolean {
@@ -28,6 +37,16 @@ export default class Action {
       return true;
     }
     return false;
+  }
+
+  getDtAngle(dt: number): number {
+    let cur = this.timeCount;
+    if (dt + this.timeCount > this.timer) {
+      this.timeCount = this.timer;
+    } else {
+      this.timeCount += dt;
+    }
+    return (this.timeCount - cur) * this.angle / this.timer;
   }
 
   getDtv2(dt: number): Vec2 {
@@ -38,7 +57,6 @@ export default class Action {
       this.timeCount += dt;
     }
     let nextDist = this.cal();
-    
 
     return this.vec.scale(nextDist - curDist);
   }
@@ -65,6 +83,14 @@ export default class Action {
     action.vec = vec;
     action.timer = timer;
     action.cal = action.quadratic;
+    return action;
+  }
+
+  static rotate(angle: number, timer: number): Action {
+    let action = new Action();
+    action.angle = angle;
+    action.timer = timer;
+    action._isRotation = true;
     return action;
   }
 

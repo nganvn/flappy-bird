@@ -7,6 +7,7 @@ import Rectangle from './subject/rect';
 import Label from './subject/label';
 import Sprite from './subject/sprite';
 import Animation from './action/animation';
+import Sequence from './action/sequence';
 
 enum GameState {
 	Await = 0,
@@ -43,6 +44,7 @@ export default class MyScene extends Scene {
   private _appPipe: NodeJS.Timeout;
   private _addScore: NodeJS.Timeout;
   private _addCloud: NodeJS.Timeout;
+  private _birdDelay: NodeJS.Timeout;
   private _play: () => void;
   private _endGame: () => void;
   private scale: number = 800/512;
@@ -63,9 +65,14 @@ export default class MyScene extends Scene {
 
   }
 
+  randomTrueFalse(): boolean {
+    return Math.round(Math.random()) == 0;
+  }
+
   initAwaitScreen() {
     let canvas = this.canvas;
-    this.background = new Sprite('./sprites/background-day.png', size(288,512));
+    this.background = new Sprite(this.randomTrueFalse()?
+      './sprites/background-day.png' : './sprites/background-night.png', size(288,512));
     this.background.scale(this.scale);
 
     this.ground = new Sprite('./sprites/base.png', size(336,112));
@@ -75,17 +82,21 @@ export default class MyScene extends Scene {
     this.ground1.scale(this.scale);
     this.ground1.setPosition(v2(this.ground.getSize().width, canvas.height - this.ground.getSize().height));
 
-    this.bird = new Sprite('./sprites/bluebird-midflap.png', size(34, 24));
+    let bird = this.randomTrueFalse() ? 'bluebird' : this.randomTrueFalse() ? 'redbird' : 'yellowbird';
+
+    this.bird = new Sprite(`./sprites/${bird}-midflap.png`, size(34, 24));
     this.bird.scale(this.scale);
     this.bird.setPosition(v2(canvas.width/4, canvas.height/2 - this.bird.getSize().height/2));
+    // this.bird.setAngle(45);
 
     let birdAnimation = new Animation();
-    birdAnimation.addFrame('./sprites/bluebird-upflap.png');
-    birdAnimation.addFrame('./sprites/bluebird-midflap.png');
-    birdAnimation.addFrame('./sprites/bluebird-downflap.png');
-    birdAnimation.timer = 0.2;
+    birdAnimation.addFrame(`./sprites/${bird}-upflap.png`);
+    birdAnimation.addFrame(`./sprites/${bird}-midflap.png`);
+    birdAnimation.addFrame(`./sprites/${bird}-downflap.png`);
+    birdAnimation.timer = 0.08;
     this.bird.addAnimation(birdAnimation);
     this.birdAni = birdAnimation;
+    setTimeout(() => this.birdAni.start(), 1000);
 
     this.helper = new Label("Tap to play");
     this.helper.setFont('60px Gotham, Helvetica Neue, sans-serif');
@@ -98,7 +109,7 @@ export default class MyScene extends Scene {
     this.add(this.background, 0);
     this.add(this.ground, 10);
     this.add(this.ground1, 10);
-    this.add(this.bird, 20);
+    this.add(this.bird, 5);
     this.add(this.helper, 60);
     
     // this._play = (): void => {this.play()};
@@ -116,9 +127,7 @@ export default class MyScene extends Scene {
     this.add(this.score, 30); 
 
 
-    this.bird.setVelocity(v2(0,-400));
-    this.bird.setForce(v2(0, 1200));
-    this.birdAni.start();
+    this.fly();
 
     this.ground.setVelocity(v2(-150, 0));
     this.ground1.setVelocity(v2(-150, 0));
@@ -127,7 +136,7 @@ export default class MyScene extends Scene {
     this.canvas.removeEventListener('mousedown', this.play);
     this._addScore = setTimeout(this.addScore, 3300);
     this._appPipe = setTimeout(() => this.addpipe(), 1000);
-    // this._addCloud = setTimeout(() => this.addCloud(), 100);
+    this._addCloud = setTimeout(() => this.addCloud(), 100);
     this.canvas.addEventListener('mousedown', this.clickEvent);
     this.gameState = GameState.Playing;
     this.removeByName('helper');
@@ -218,13 +227,14 @@ export default class MyScene extends Scene {
     // pipeUp.setPosition(v2(450, 300 + randx));
     // pipeUp.setVelocity(v2(-150, 0));
 
-    
-    let pipeDown = new Sprite('./sprites/pipe-green-down.png', size(52,320));
+    let pipe = this.randomTrueFalse() ? 'green' : 'red';
+
+    let pipeDown = new Sprite(`./sprites/pipe-${pipe}-down.png`, size(52,320));
     pipeDown.scale(this.scale);
     pipeDown.setPosition(v2(450, -380 + randx ));
     pipeDown.setVelocity(v2(-150, 0));
 
-    let pipeUp = new Sprite('./sprites/pipe-green-up.png', size(52,320));
+    let pipeUp = new Sprite(`./sprites/pipe-${pipe}-up.png`, size(52,320));
     pipeUp.scale(this.scale);
     pipeUp.setPosition(v2(450, 300 + randx));
     pipeUp.setVelocity(v2(-150, 0));
@@ -273,6 +283,21 @@ export default class MyScene extends Scene {
 
   }
 
+  fly() {
+    this.birdAni.start();
+    this.bird.setVelocity(v2(0,-400));
+    this.bird.setForce(v2(0, 1200));
+    let angle = this.bird.getAngle();
+    // console.log(angle);
+    let rotate = Action.rotate(-20 - angle, 0.3);
+    let rotateAwait = Action.rotate(0, 0.1);
+    let rotateBack = Action.rotate(110, 0.7);
+    clearTimeout(this._birdDelay);
+    this._birdDelay = setTimeout(() => this.birdAni.stop(), 700);
+
+    this.bird.addAction(new Sequence(rotate, rotateAwait, rotateBack));
+  }
+
   isCollisionWithPipe(): boolean {
     let result = this._pipes.filter((pipe) => this.isRectCollieRect(this.bird, pipe.pipeDown) || this.isRectCollieRect(this.bird, pipe.pipeUp));
     return result.length > 0;
@@ -287,8 +312,7 @@ export default class MyScene extends Scene {
       return;
     }
     if (this.bird.getPosition().y >= 40) {
-      this.bird.setVelocity(v2(0,-400));
-      this.bird.setForce(v2(0, 1200));
+      this.fly();
     }
 
     this.gameState = GameState.Playing;
@@ -321,11 +345,12 @@ export default class MyScene extends Scene {
         delete this._pipes[0].pipeDown;
         this._pipes.splice(0,1);
       }
-      if (this.isCollisionWithPipe() || Game.getInstance().getCanvas().height <= this.bird.getPosition().y + 220) {
+      if (this.isCollisionWithPipe() || Game.getInstance().getCanvas().height <= this.bird.getPosition().y + 215) {
         this.endGame();
       }
     }
-    if (this.gameState == GameState.GameOver && Game.getInstance().getCanvas().height <= this.bird.getPosition().y + 205) {
+    if (this.gameState == GameState.GameOver && Game.getInstance().getCanvas().height <= this.bird.getPosition().y + 215) {
+      this.bird.setPosition(v2(this.bird.getPosition().x, Game.getInstance().getCanvas().height - 212))
       this.bird.setForce(v2(0,0));
       this.bird.setVelocity(v2(0,0));
       
