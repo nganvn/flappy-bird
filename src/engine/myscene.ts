@@ -1,13 +1,14 @@
 import Action from './action/action';
-import game from './game';
 import Game from './game';
 import Scene from './scene';
-import { size, v2, Vec2 } from './utils';
+import { size, v2, Vec2, Size } from './utils';
 import Rectangle from './subject/rect';
 import Label from './subject/label';
 import Sprite from './subject/sprite';
 import Animation from './action/animation';
 import Sequence from './action/sequence';
+import ImageLoading from './imageloading';
+import { CONSTANT } from './constant';
 
 enum GameState {
 	Await = 0,
@@ -15,15 +16,11 @@ enum GameState {
 	GameOver
 }
 
-class CONSTANT {
-  public static readonly PIPEDELAY = 1600;
-}
-
-
 export default class MyScene extends Scene {
+  private gameState: GameState;
+
   private background: Sprite;
-  private ground: Sprite;
-  private ground1: Sprite;
+  private ground: Array<Sprite>;
 
   private helper: Label;
 
@@ -32,74 +29,63 @@ export default class MyScene extends Scene {
   private birdAni: Animation;
   private intScore: number;
   private highScore: number;
-  private isKeydown = false;
 
   private _pipes: Array<{pipeUp: Sprite, pipeDown: Sprite}>;
   private _cloud: Array<Sprite>;
 
-  private ctx: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
-  private gameState: GameState;
+  private imageLoading: ImageLoading;
 
   private _appPipe: NodeJS.Timeout;
   private _addScore: NodeJS.Timeout;
   private _addCloud: NodeJS.Timeout;
   private _birdDelay: NodeJS.Timeout;
-  private _play: () => void;
-  private _endGame: () => void;
-  private scale: number = 800/512;
 
   constructor() {
     super();
     this.gameState = GameState.Await;
     this.intScore = 0;
     this.highScore = 0;
+    this.ground = new Array<Sprite>();
     this._pipes = new Array<{pipeUp: Sprite, pipeDown: Sprite}>();
     this._cloud = new Array<Sprite>();
     
     let game = Game.getInstance();
     
-    this.ctx = game.getCtx();
     this.canvas = game.getCanvas()
     this.gameState = GameState.Await;
+    this.imageLoading = ImageLoading.getInstance();
 
   }
 
-  randomTrueFalse(): boolean {
-    return Math.round(Math.random()) == 0;
-  }
-
-  initAwaitScreen() {
+  public initAwaitScreen(): void {
+    let imageLoading = this.imageLoading;
     let canvas = this.canvas;
-    this.background = new Sprite(this.randomTrueFalse()?
-      './sprites/background-day.png' : './sprites/background-night.png', size(288,512));
-    this.background.scale(this.scale);
 
-    this.ground = new Sprite('./sprites/base.png', size(336,112));
-    this.ground.scale(this.scale);
-    this.ground.setPosition(v2(0, canvas.height - this.ground.getSize().height));
-    this.ground1 = new Sprite('./sprites/base.png', size(336,112));
-    this.ground1.scale(this.scale);
-    this.ground1.setPosition(v2(this.ground.getSize().width, canvas.height - this.ground.getSize().height));
+    this.background = new Sprite(imageLoading.getByName(CONSTANT.BACKGROUND).image);
 
-    let bird = this.randomTrueFalse() ? 'bluebird' : this.randomTrueFalse() ? 'redbird' : 'yellowbird';
+    var ground = new Sprite(imageLoading.getByName(CONSTANT.GROUND).image);
+    ground.setPosition(v2(0, canvas.height - ground.getSize().height));
+    this.ground.push(ground);
 
-    this.bird = new Sprite(`./sprites/${bird}-midflap.png`, size(34, 24));
-    this.bird.scale(this.scale);
+    ground = new Sprite(imageLoading.getByName(CONSTANT.GROUND).image);
+    ground.setPosition(v2(ground.getSize().width, canvas.height - ground.getSize().height));
+    this.ground.push(ground);
+
+    this.bird = new Sprite(imageLoading.getByName(CONSTANT.BLUEBIRD).image);
     this.bird.setPosition(v2(canvas.width/4, canvas.height/2 - this.bird.getSize().height/2));
-    // this.bird.setAngle(45);
 
     let birdAnimation = new Animation();
-    birdAnimation.addFrame(`./sprites/${bird}-upflap.png`);
-    birdAnimation.addFrame(`./sprites/${bird}-midflap.png`);
-    birdAnimation.addFrame(`./sprites/${bird}-downflap.png`);
-    birdAnimation.timer = 0.08;
+    let blueBirdFrame = imageLoading.getAllByPreName(CONSTANT.BLUEBIRDFRAME)
+    blueBirdFrame.forEach( (frame) => birdAnimation.addFrame(frame.image));
+    birdAnimation.setTimer(0.1);
+
     this.bird.addAnimation(birdAnimation);
     this.birdAni = birdAnimation;
     setTimeout(() => this.birdAni.start(), 1000);
 
     this.helper = new Label("Tap to play");
-    this.helper.setFont('60px Gotham, Helvetica Neue, sans-serif');
+    this.helper.setFont('30px Gotham, Helvetica Neue, sans-serif');
     this.helper.setPosition(v2(this.canvas.width/2, 200));
     this.helper.setColor('red');
     this.helper.setName("helper");
@@ -107,142 +93,29 @@ export default class MyScene extends Scene {
 
 
     this.add(this.background, 0);
-    this.add(this.ground, 10);
-    this.add(this.ground1, 10);
+    this.add(this.ground[0], 10);
+    this.add(this.ground[1], 10);
     this.add(this.bird, 5);
     this.add(this.helper, 60);
-    
-    // this._play = (): void => {this.play()};
+
     this.canvas.addEventListener('mousedown', this.play);
     this.gameState = GameState.Await;
     this.intScore = 0;
   }
 
-  private play = (event: any) : void => {
-    this.score = new Label("0");
-    this.score.setFont('80px Gotham, Helvetica Neue, sans-serif');
-    this.score.setPosition(v2(this.canvas.width/2, 140));
-    this.score.setColor('red');
-    this.score.setAlign('center');
-    this.add(this.score, 30); 
+  private addpipe(): void {
+    let imageLoading = this.imageLoading;
+    let randx = this.randomInt(160);
 
+    let pipeDown = new Sprite(imageLoading.getByName(CONSTANT.GREENPIPEDOWN).image);
 
-    this.fly();
+    pipeDown.setPosition(v2(this.canvas.width, -250 + randx ));
+    pipeDown.setVelocity(v2(-CONSTANT.SPEED, 0));
 
-    this.ground.setVelocity(v2(-150, 0));
-    this.ground1.setVelocity(v2(-150, 0));
-    
+    let pipeUp = new Sprite(imageLoading.getByName(CONSTANT.GREENPIPEUP).image);
 
-    this.canvas.removeEventListener('mousedown', this.play);
-    this._addScore = setTimeout(this.addScore, 3300);
-    this._appPipe = setTimeout(() => this.addpipe(), 1000);
-    this._addCloud = setTimeout(() => this.addCloud(), 100);
-    this.canvas.addEventListener('mousedown', this.clickEvent);
-    this.gameState = GameState.Playing;
-    this.removeByName('helper');
-  }
-
-  private replay = (event: any) : void => {
-    this.removeAll();
-    this.initAwaitScreen();
-    this._pipes.splice(0, this._pipes.length);
-    this._cloud.splice(0, this._cloud.length);
-    this.canvas.removeEventListener('mousedown', this.replay);
-  }
-
-  private endGame = () : void => {
-    this._pipes.forEach((item) => {
-      item.pipeUp.setVelocity(v2(0,0));
-      item.pipeDown.setVelocity(v2(0,0));
-    });
-    this._cloud.forEach((item) => {
-      item.setVelocity(v2(0,0));
-    });
-
-    this.ground.setVelocity(v2(0,0));
-    this.ground1.setVelocity(v2(0,0));
-    this.birdAni.stop();
-
-    clearTimeout(this._appPipe);
-    clearTimeout(this._addScore);
-    clearTimeout(this._addCloud);
-    this.gameState = GameState.GameOver;
-    
-    this.canvas.removeEventListener('mousedown', this.clickEvent);
-    setTimeout(() => this.canvas.addEventListener('mousedown', this.replay), 1500);
-
-    let gameOver = new Label("Game Over");
-    gameOver.setFont('60px Gotham, Helvetica Neue, sans-serif');
-    gameOver.setPosition(v2(this.canvas.width/2, 200));
-    gameOver.setColor('blue');
-    gameOver.setName("helper");
-    gameOver.setAlign('center');
-
-    let highScoreLabel = new Label("Highscore: " + this.highScore);
-
-    if (this.intScore > this.highScore) {
-      this.highScore = this.intScore;
-      highScoreLabel.setText("New Highscore: " + this.highScore)
-    }
-
-    highScoreLabel.setFont('50px Gotham, Helvetica Neue, sans-serif');
-    highScoreLabel.setPosition(v2(this.canvas.width/2, 280));
-    highScoreLabel.setColor('red');
-    highScoreLabel.setName("helper");
-    highScoreLabel.setAlign('center');
-
-    let replayLable = new Label("Tap to replay");
-    replayLable.setFont('60px Gotham, Helvetica Neue, sans-serif');
-    replayLable.setPosition(v2(this.canvas.width/2, 400));
-    replayLable.setColor('blue');
-    replayLable.setName("helper");
-    replayLable.setAlign('center');
-
-    setTimeout(() => this.add(gameOver, 100), 200);
-    setTimeout(() =>  this.add(highScoreLabel, 100), 600);
-    setTimeout(() =>  this.add(replayLable, 100), 1000);
-
-  }
-
-  private addScore = () => {
-    this.intScore++;
-    this.score.setText("" + this.intScore);
-    this._addScore = setTimeout(this.addScore, CONSTANT.PIPEDELAY);
-  }
-
-  private addpipe() {
-    let randx = this.randomInt(220);
-
-    let r = this.randomInt(100) + 50;
-    let g = this.randomInt(100) + 50;
-    let b = this.randomInt(100) + 50;
-    
-    // let pipeDown = new Rectangle(size(50, 500));
-    // pipeDown.setColor(`rgb(${r}, ${g}, ${b})`);
-    // pipeDown.setPosition(v2(450, -380 + randx ));
-    // pipeDown.setVelocity(v2(-150, 0));
-
-    // let pipeUp = new Rectangle(size(50, 500));
-    // pipeUp.setColor(`rgb(${r}, ${g}, ${b})`);
-    // pipeUp.setPosition(v2(450, 300 + randx));
-    // pipeUp.setVelocity(v2(-150, 0));
-
-    let pipe = this.randomTrueFalse() ? 'green' : 'red';
-
-    let pipeDown = new Sprite(`./sprites/pipe-${pipe}-down.png`, size(52,320));
-    pipeDown.scale(this.scale);
-    pipeDown.setPosition(v2(450, -380 + randx ));
-    pipeDown.setVelocity(v2(-150, 0));
-
-    let pipeUp = new Sprite(`./sprites/pipe-${pipe}-up.png`, size(52,320));
-    pipeUp.scale(this.scale);
-    pipeUp.setPosition(v2(450, 300 + randx));
-    pipeUp.setVelocity(v2(-150, 0));
-
-    // let action = Action.moveBy(v2(-600, 0), 4);
-
-    // pipeDown.addAction(action);
-    // pipeUp.addAction(action.clone());
+    pipeUp.setPosition(v2(this.canvas.width, 180 + randx));
+    pipeUp.setVelocity(v2(-CONSTANT.SPEED, 0));
 
     this.add(pipeDown, 2);
     this.add(pipeUp, 2);
@@ -252,14 +125,15 @@ export default class MyScene extends Scene {
     this._appPipe = setTimeout(() => this.addpipe(), CONSTANT.PIPEDELAY);
   }
 
-  private addCloud() {
+  private addCloud(): void {
+    let imageLoading = ImageLoading.getInstance();
+
     let randx = this.randomInt(150);
-    let cloud = new Sprite('./sprites/cloud.png', size(150, 110));
+    let cloud = new Sprite(imageLoading.getByName(CONSTANT.CLOUD).image);
     cloud.scale(Math.random() + 0.8)
-    // cloud.setColor('rgb(222, 227, 226)');
-    cloud.setPosition(v2(450, randx ))
+    cloud.setPosition(v2(450, randx))
     
-    cloud.setVelocity(v2(-75, 0));
+    cloud.setVelocity(v2(- CONSTANT.SPEED / 2, 0));
     this.add(cloud, 1);
 
     this._cloud.push(cloud);
@@ -267,7 +141,7 @@ export default class MyScene extends Scene {
 
   }
 
-  isRectCollieRect(rec1: Rectangle, rec2: Rectangle): boolean {
+  private isRectCollieRect(rec1: Rectangle, rec2: Rectangle): boolean {
     let rec1Pos = rec1.getPosition();
     let rec1Size = rec1.getSize();
 
@@ -283,25 +157,146 @@ export default class MyScene extends Scene {
 
   }
 
-  fly() {
+  private isCollisionWithPipe(): boolean {
+    let result = this._pipes.filter((pipe) => this.isRectCollieRect(this.bird, pipe.pipeDown) || this.isRectCollieRect(this.bird, pipe.pipeUp));
+    return result.length > 0;
+  }
+
+  private fly(): void {
     this.birdAni.start();
-    this.bird.setVelocity(v2(0,-400));
-    this.bird.setForce(v2(0, 1200));
+    this.bird.setVelocity(v2(0,-300));
+    this.bird.setForce(v2(0, 1000));
     let angle = this.bird.getAngle();
-    // console.log(angle);
-    let rotate = Action.rotate(-20 - angle, 0.3);
-    let rotateAwait = Action.rotate(0, 0.1);
-    let rotateBack = Action.rotate(110, 0.7);
+
+    let rotate = Action.rotate(-20 - angle, 0.25);
+    let rotateAwait = Action.rotate(0, 0.15);
+    let rotateBack = Action.rotate(110, 0.5);
     clearTimeout(this._birdDelay);
-    this._birdDelay = setTimeout(() => this.birdAni.stop(), 700);
+    this._birdDelay = setTimeout(() => this.birdAni.stop(), 500);
 
     this.bird.addAction(new Sequence(rotate, rotateAwait, rotateBack));
   }
 
-  isCollisionWithPipe(): boolean {
-    let result = this._pipes.filter((pipe) => this.isRectCollieRect(this.bird, pipe.pipeDown) || this.isRectCollieRect(this.bird, pipe.pipeUp));
-    return result.length > 0;
+  public update(dt: number): void {
+    if (this.gameState == GameState.Playing) {
+      if (this.ground[0].getPosition().x < -this.ground[0].getSize().width) {
+        this.ground[0].translate(v2(this.ground[0].getSize().width*2, -0));
+        let tmp = this.ground[1];
+        this.ground[1] = this.ground[0];
+        this.ground[0] = tmp;
+      }
+
+      if (this._cloud.length > 0 && this._cloud[0].getPosition().x < -400) {
+        this.remove(this._cloud[0]);
+        delete this._cloud[0];
+        this._cloud.splice(0,1);
+      }
+      if (this._pipes.length > 0 && this._pipes[0].pipeUp.getPosition().x < -200) {
+        this.remove(this._pipes[0].pipeUp);
+        this.remove(this._pipes[0].pipeDown);
+        delete this._pipes[0].pipeUp;
+        delete this._pipes[0].pipeDown;
+        this._pipes.splice(0,1);
+      }
+      if (this.isCollisionWithPipe() || Game.getInstance().getCanvas().height <= this.bird.getPosition().y + 134) {
+        this.endGame();
+      }
+    }
+    if (this.gameState == GameState.GameOver && Game.getInstance().getCanvas().height <= this.bird.getPosition().y + 134) {
+      this.bird.setPosition(v2(this.bird.getPosition().x, Game.getInstance().getCanvas().height - 134))
+      this.bird.setForce(v2(0,0));
+      this.bird.setVelocity(v2(0,0));
+    }
+    super.update(dt);
   }
+
+  private play = (event: any) : void => {
+    this.score = new Label("0");
+    this.score.setFont('40px Gotham, Helvetica Neue, sans-serif');
+    this.score.setPosition(v2(this.canvas.width/2, 140));
+    this.score.setColor('red');
+    this.score.setAlign('center');
+    this.add(this.score, 30); 
+
+    this.fly();
+
+    this.ground[0].setVelocity(v2(- CONSTANT.SPEED, 0));
+    this.ground[1].setVelocity(v2(- CONSTANT.SPEED, 0));
+    
+    this.canvas.removeEventListener('mousedown', this.play);
+    this._addScore = setTimeout(this.addScore, 3200);
+    this._appPipe = setTimeout(() => this.addpipe(), 1000);
+    this._addCloud = setTimeout(() => this.addCloud(), 100);
+    this.canvas.addEventListener('mousedown', this.clickEvent);
+    this.gameState = GameState.Playing;
+    this.removeByName('helper');
+  }
+
+  private replay = (event: any) : void => {
+    this.removeAll();
+    this.initAwaitScreen();
+    this._pipes.splice(0, this._pipes.length);
+    this._cloud.splice(0, this._cloud.length);
+    this.canvas.removeEventListener('mousedown', this.replay);
+  } 
+  
+  private endGame = () : void => {
+    this._pipes.forEach((item) => {
+      item.pipeUp.setVelocity(v2(0,0));
+      item.pipeDown.setVelocity(v2(0,0));
+    });
+    this._cloud.forEach((item) => {
+      item.setVelocity(v2(0,0));
+    });
+
+    this.ground[0].setVelocity(v2(0,0));
+    this.ground[1].setVelocity(v2(0,0));
+    this.birdAni.stop();
+
+    clearTimeout(this._appPipe);
+    clearTimeout(this._addScore);
+    clearTimeout(this._addCloud);
+    this.gameState = GameState.GameOver;
+    
+    this.canvas.removeEventListener('mousedown', this.clickEvent);
+    setTimeout(() => this.canvas.addEventListener('mousedown', this.replay), 1500);
+
+    let gameOver = new Label("Game Over");
+    gameOver.setFont('40px Gotham, Helvetica Neue, sans-serif');
+    gameOver.setPosition(v2(this.canvas.width/2, 200));
+    gameOver.setColor('blue');
+    gameOver.setAlign('center');
+
+    let highScoreLabel = new Label("Highscore: " + this.highScore);
+
+    if (this.intScore > this.highScore) {
+      this.highScore = this.intScore;
+      highScoreLabel.setText("New Highscore: " + this.highScore)
+    }
+
+    highScoreLabel.setFont('30px Gotham, Helvetica Neue, sans-serif');
+    highScoreLabel.setPosition(v2(this.canvas.width/2, 250));
+    highScoreLabel.setColor('red');
+    highScoreLabel.setAlign('center');
+
+    let replayLable = new Label("Tap to replay");
+    replayLable.setFont('40px Gotham, Helvetica Neue, sans-serif');
+    replayLable.setPosition(v2(this.canvas.width/2, 300));
+    replayLable.setColor('blue');
+    replayLable.setAlign('center');
+
+    setTimeout(() => this.add(gameOver, 100), 200);
+    setTimeout(() =>  this.add(highScoreLabel, 100), 600);
+    setTimeout(() =>  this.add(replayLable, 100), 1000);
+
+  }  
+  
+  private addScore = (): void => {
+    this.intScore++;
+    this.score.setText("" + this.intScore);
+    this._addScore = setTimeout(this.addScore, CONSTANT.PIPEDELAY);
+  }
+
 
   private clickEvent = (event: any) : void => {
     if (!this.gameState) {
@@ -320,43 +315,6 @@ export default class MyScene extends Scene {
     let y = event.y - this.canvas.offsetTop;
 
     let subject = this.checkClick(v2(x,y));
-    // console.log(subject);
-  }
-
-
-  update(dt: number) {
-    if (this.gameState == GameState.Playing) {
-      if (this.ground.getPosition().x < -this.ground.getSize().width) {
-        this.ground.translate(v2(this.ground.getSize().width*2, -0));
-        let tmp = this.ground1;
-        this.ground1 = this.ground;
-        this.ground = tmp;
-      }
-
-      if (this._cloud.length > 0 && this._cloud[0].getPosition().x < -400) {
-        this.remove(this._cloud[0]);
-        delete this._cloud[0];
-        this._cloud.splice(0,1);
-      }
-      if (this._pipes.length > 0 && this._pipes[0].pipeUp.getPosition().x < -200) {
-        this.remove(this._pipes[0].pipeUp);
-        this.remove(this._pipes[0].pipeDown);
-        delete this._pipes[0].pipeUp;
-        delete this._pipes[0].pipeDown;
-        this._pipes.splice(0,1);
-      }
-      if (this.isCollisionWithPipe() || Game.getInstance().getCanvas().height <= this.bird.getPosition().y + 215) {
-        this.endGame();
-      }
-    }
-    if (this.gameState == GameState.GameOver && Game.getInstance().getCanvas().height <= this.bird.getPosition().y + 215) {
-      this.bird.setPosition(v2(this.bird.getPosition().x, Game.getInstance().getCanvas().height - 212))
-      this.bird.setForce(v2(0,0));
-      this.bird.setVelocity(v2(0,0));
-      
-    }
-
-    super.update(dt);
   }
 
   private randomInt(max: number): number {

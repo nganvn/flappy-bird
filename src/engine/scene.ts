@@ -11,8 +11,17 @@ export default class Scene {
     this._subject = new Array<{subject: Subject, index:number}>()
     this.previous = new Date();
   }
+  
+  private render(): void {
+    this._subject.forEach((subject) => subject.subject.render());
+  }
 
-  add(subject: Subject, index: number): void {
+  private clear(): void {
+    let canvas = Game.getInstance().getCanvas();
+    Game.getInstance().getCtx().clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  public add(subject: Subject, index: number): void {
     let insertIndex = this._subject.findIndex((subject) => subject.index > index);
     if (insertIndex == -1) {
       this._subject.push({subject: subject, index: index});
@@ -23,7 +32,7 @@ export default class Scene {
     }
   }
 
-  remove(subject: Subject){
+  public remove(subject: Subject): void {
     const index = this._subject.findIndex((ele) => {
       return ele.subject == subject});
     if (index > -1) {
@@ -31,7 +40,7 @@ export default class Scene {
     }
   }
 
-  removeByName(name: String): void {
+  public removeByName(name: String): void {
     const index = this._subject.findIndex((ele) => {
       return ele.subject.getName() == name});
     if (index > -1) {
@@ -39,19 +48,19 @@ export default class Scene {
     }
   }
 
-  removeAll(): void {
+  public removeAll(): void {
     this._subject.splice(0, this._subject.length);
   }
 
-  processInput(): void {
+  public processInput(): void {
 
   }
 
-  start() {
+  public start() {
     this.update(0);
   }
 
-  update(dt: number): void {
+  public update(dt: number): void {
     let current = new Date();
     let elapsed = (current.getTime() - this.previous.getTime()) / 1000;
     this.previous = current;
@@ -66,20 +75,12 @@ export default class Scene {
     this.loopEvent = window.requestAnimationFrame(() => this.update(dt));
   }
 
-  stop(): void {
+  public stop(): void {
     window.cancelAnimationFrame(this.loopEvent);
   }
 
-  private render(): void {
-    this._subject.forEach((subject) => subject.subject.render());
-  }
 
-  private clear(): void {
-    let canvas = Game.getInstance().getCanvas();
-    Game.getInstance().getCtx().clearRect(0, 0, canvas.width, canvas.height);
-  }
-
-  checkClick(vec: Vec2): Subject {
+  public checkClick(vec: Vec2): Subject {
     for (let i = this._subject.length - 1; i >=0 ; i--) {
       if (this._subject[i].subject.checkClick(vec)) {
         return this._subject[i].subject;

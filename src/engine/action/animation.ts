@@ -1,11 +1,11 @@
 import { Queue } from 'queue-typescript';
 import { size, Size } from '../utils';
 export default class Animation {
-  frame: Array<HTMLImageElement>;
-  iFrame: number;
-  timer: number;
-  timeCount: number;
-  _isRunning: boolean;
+  private frame: Array<HTMLImageElement>;
+  private iFrame: number;
+  private timer: number;
+  private timeCount: number;
+  private _isRunning: boolean;
   constructor() {
     this.frame = new Array<HTMLImageElement>();
     this.timeCount = 0;
@@ -14,31 +14,33 @@ export default class Animation {
     this.iFrame = 0;
   }
 
-  addFrame(src: string): void {
-    let image = new Image();
-    image.src = src;
+  public setTimer(timer: number): void {
+    this.timer = timer;
+  }
+
+  public addFrame(image: HTMLImageElement): void {
     this.frame.push(image);
   }
 
-  getFrame(): HTMLImageElement {
+  public getFrame(): HTMLImageElement {
     return this.frame[this.iFrame];
   }
 
-  start() {
+  public start(): void {
     this._isRunning = true;
     this.timeCount = 0;
     this.iFrame = 0;
   }
 
-  stop() {
+  public stop(): void {
     this._isRunning = false;
   }
 
-  isRunning(): boolean {
+  public isRunning(): boolean {
     return this._isRunning;
   }
 
-  update(dt: number) {
+  public update(dt: number): void {
     this.timeCount += dt;
     if (this.timeCount >= this.timer) {
       this.timeCount -= this.timer;

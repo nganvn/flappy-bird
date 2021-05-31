@@ -1,7 +1,6 @@
 import Action from './action';
 import { Vec2, size } from '../utils';
 export default class Sequence extends Action {
-
   private readonly _actions: Array<Action>;
 
   constructor(...actions: Action[]) {

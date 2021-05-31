@@ -1,9 +1,9 @@
 import Subject from '../base/subject';
 import Game from '../game';
 export default class Label extends Subject {
-  text: string;
-  font: string;
-  align: string;
+  protected text: string;
+  protected font: string;
+  protected align: string;
   
   constructor(text: string) {
     super();
@@ -12,22 +12,23 @@ export default class Label extends Subject {
     this.align = 'left';
   }
 
-  setFont(font: string) {
+  public setFont(font: string) {
     this.font = font;
   }
   
-  setAlign(align: string) {
+  public setAlign(align: string) {
     this.align = align;
   }
 
-  setText(text: string) {
+  public setText(text: string) {
     this.text = text;
   }
 
-  update(dt: number): void {
+  public update(dt: number): void {
+
   }
 
-  render(): void {
+  public render(): void {
     let ctx = Game.getInstance().getCtx();
     ctx.font = this.font;
     ctx.fillStyle = this.color;

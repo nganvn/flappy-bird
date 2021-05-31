@@ -1,18 +1,10 @@
 import Scene from './scene';
 
 export default class Game{
-  
-  private readonly _node: Array<Node> = new Array<Node>();
   private static instance: Game;
 
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-
-  private opacity: number = 100;
-  private opacityInc: boolean = false;
-
-  private isKeydown = false;
-  public readonly scale = 800/512;
 
   private constructor(width:number, height:number) {
     this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -23,24 +15,20 @@ export default class Game{
 
   public static getInstance(): Game{
     if (!Game.instance) {
-      Game.instance = new Game(450, 800);
+      Game.instance = new Game(288, 512);
     }
     return this.instance;
   }
 
-  private getRandomInt = (max: number): number => {
-    return Math.floor(Math.random() * max);
-  }
-
-  runWithSence(scene: Scene): void {
+  public runWithSence(scene: Scene): void {
     setTimeout(() => self.requestAnimationFrame(() => scene.start()), 500);
   }
 
-  getCtx() {
+  public getCtx(): CanvasRenderingContext2D{
     return this.ctx;
   }
 
-  getCanvas() {
+  public getCanvas(): HTMLCanvasElement {
     return this.canvas;
   }
 

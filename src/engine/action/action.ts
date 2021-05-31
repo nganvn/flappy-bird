@@ -1,13 +1,13 @@
 import { Vec2, v2 } from '../utils';
 export default class Action {
-  protected vec: Vec2;
-  protected timer: number;
-  protected a: number;
-  protected angle = 0;
-  timeCount: number;
-  protected cal: () => number;
+  private vec: Vec2;
+  private timer: number;
+  private a: number;
+  private angle = 0;
+  private timeCount: number;
+  private cal: () => number;
 
-  _isRotation: boolean;
+  private _isRotation: boolean;
 
   constructor() {
     this.vec = v2(0,0);
@@ -18,7 +18,7 @@ export default class Action {
     this._isRotation = false;
   }
 
-  protected copy(action: Action) {
+  public copy(action: Action) {
     this.vec = action.vec;
     this.timer = action.timer;
     this.a = action.a;
@@ -28,18 +28,18 @@ export default class Action {
     this.isRotation = this.isRotation
   }
 
-  isRotation(): boolean {
+  public isRotation(): boolean {
     return true;
   }
 
-  isEndAction(): boolean {
+  public isEndAction(): boolean {
     if (this.timer <= this.timeCount) {
       return true;
     }
     return false;
   }
 
-  getDtAngle(dt: number): number {
+  public getDtAngle(dt: number): number {
     let cur = this.timeCount;
     if (dt + this.timeCount > this.timer) {
       this.timeCount = this.timer;
@@ -49,7 +49,7 @@ export default class Action {
     return (this.timeCount - cur) * this.angle / this.timer;
   }
 
-  getDtv2(dt: number): Vec2 {
+  public getDtv2(dt: number): Vec2 {
     let curDist = this.cal();
     if (dt + this.timeCount > this.timer) {
       this.timeCount = this.timer;
@@ -61,7 +61,7 @@ export default class Action {
     return this.vec.scale(nextDist - curDist);
   }
 
-  clone(): Action {
+  public clone(): Action {
     let action = new Action();
     action.vec = this.vec;
     action.timer = this.timer;
@@ -76,6 +76,18 @@ export default class Action {
     action.timer = timer;
     action.cal = action.linear;
     return action;
+  }
+
+  private quadratic(): number {
+    return 4 * (this.timeCount / this.timer) * (1 - this.timeCount / this.timer);
+  }
+
+  private linear(): number {
+    return this.timeCount / this.timer;
+  } 
+
+  private easeIn(): number {
+    return 2 * (this.timeCount / this.timer) * (1 - this.timeCount / this.timer / 2);
   }
 
   static jumpBy(vec: Vec2, timer: number): Action{
@@ -94,17 +106,6 @@ export default class Action {
     return action;
   }
 
-  private quadratic(): number {
-    return 4 * (this.timeCount / this.timer) * (1 - this.timeCount / this.timer);
-  }
-
-  private linear(): number {
-    return this.timeCount / this.timer;
-  } 
-
-  private easeIn(): number {
-    return 2 * (this.timeCount / this.timer) * (1 - this.timeCount / this.timer / 2);
-  }
 
   static moveByEaseIn(vec: Vec2){
     

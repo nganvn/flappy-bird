@@ -19,58 +19,30 @@ export default abstract class Subject {
     this.angle = 0;
   }
 
-  checkClick(vec: Vec2): boolean {
+  public addAction(action: Action): void {
+    this.action = action;
+  }
+  
+  public checkClick(vec: Vec2): boolean {
     return false;
   }
 
-  setName(name: string) {
-    this.name = name;
-  }
-
-  getName(): string {
-    return this.name;
-  }
-
-  setPosition(position: Vec2): void {
-    this.position = position;
-  }
-
-  getPosition(): Vec2 {
-    return this.position;
-  }
-
-
-  translate(vec: Vec2) {
+  public translate(vec: Vec2) {
     this.position.x += vec.x;
     this.position.y += vec.y;
   }
 
-  setColor(color: string): void {
-    this.color = color;
-  }
-
-  getColor(): string {
-    return this.color;
-  }
-
-  setAngle(angle: number) {
-    this.angle = angle;
-  }
-  getAngle(): number {
-    return this.angle;
-  }
-
-  update(dt: number): void {
+  public update(dt: number): void {
     this.position.x += this.velocity.x*dt;
     this.position.y += this.velocity.y*dt + this.force.y*dt*dt/2; 
     this.velocity.y += this.force.y*dt;
   }
 
-  render(): void {
+  public render(): void {
 
   }
 
-  runAction(dt: number) {
+  public runAction(dt: number): void {
     if (!this.action || this.action.isEndAction()) {
       this.action = null;
       return;
@@ -83,33 +55,63 @@ export default abstract class Subject {
       this.position.add(this.action.getDtv2(dt));
     }
   }
-
-  addAction(action: Action) {
-    this.action = action;
-  }
-
-  setVelocity(velocity: Vec2) {
-    this.velocity = velocity;
-  }
-
-  addVelocity(velocity: Vec2) {
-    this.velocity.add(velocity);
-  }
   
-  getVelocity(): Vec2 {
+  // get, set
+  public getName(): string {
+    return this.name;
+  }
+
+  public setName(name: string): void {
+    this.name = name;
+  }
+
+  public getPosition(): Vec2 {
+    return this.position;
+  }
+
+  public setPosition(position: Vec2): void {
+    this.position = position;
+  }
+
+  public getAngle(): number {
+    return this.angle;
+  }
+
+  public setAngle(angle: number): void {
+    this.angle = angle;
+  }
+
+  public getColor(): string {
+    return this.color;
+  }
+
+  public setColor(color: string): void {
+    this.color = color;
+  }
+
+  public getVelocity(): Vec2 {
     return this.velocity;
   }
 
-  addForce(f: Vec2) {
+  public setVelocity(velocity: Vec2): void {
+    this.velocity = velocity;
+  }
+
+  public addVelocity(velocity: Vec2): void {
+    this.velocity.add(velocity);
+  }
+  
+  public addForce(f: Vec2): void {
     this.force.add(f);
   }
 
-  setForce(f: Vec2) {
+  public getForce(): Vec2 {
+    return this.force;
+  }
+  
+  public setForce(f: Vec2): void {
     this.force = f;
   }
 
-  getForce(): Vec2 {
-    return this.force;
-  }
 }
 
