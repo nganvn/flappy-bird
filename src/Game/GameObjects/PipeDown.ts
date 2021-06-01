@@ -1,4 +1,4 @@
-import Sprite from '../../Engine1/GameObject/Sprite';
+import Sprite from '../../Engine/GameObject/Sprite';
 import ImageLoading from '../ImageLoading';
 import { CONSTANT } from '../CONSTANT';
 export default class PipeDown extends Sprite {

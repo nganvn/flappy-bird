@@ -1,14 +1,14 @@
-import Scene from '../../Engine/Scene';
-import Bird from '../GameObjects/Bird';
-import Background from '../GameObjects/Background';
-import Ground from '../GameObjects/Ground';
-import Score from '../GameObjects/Score';
 import EventHandler from '../../Engine/EventHandler/EventHandler';
-import PipeUp from '../GameObjects/PipeUp';
-import PipeDown from '../GameObjects/PipeDown';
+import Scene from '../../Engine/Scene';
+import GameController from '../../Engine/GameController/GameController';
 import Sprite from '../../Engine/GameObject/Sprite';
 import { CONSTANT } from '../CONSTANT';
-import GameController from '../../Engine/GameController/GameController';
+import Background from '../GameObjects/Background';
+import Bird from '../GameObjects/Bird';
+import Ground from '../GameObjects/Ground';
+import PipeDown from '../GameObjects/PipeDown';
+import PipeUp from '../GameObjects/PipeUp';
+import Score from '../GameObjects/Score';
 
 enum GameState {
 	Await = 0,
