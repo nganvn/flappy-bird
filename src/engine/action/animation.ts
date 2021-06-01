@@ -1,5 +1,3 @@
-import { Queue } from 'queue-typescript';
-import { size, Size } from '../utils';
 export default class Animation {
   private frame: Array<HTMLImageElement>;
   private iFrame: number;

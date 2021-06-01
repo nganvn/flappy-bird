@@ -1,91 +1,72 @@
-import Subject from './base/subject';
-import Game from './game';
-import { Vec2 } from './utils';
+import GameObject from './base/gameobject';
 
 export default class Scene {
-  private readonly _subject: Array<{subject: Subject, index:number}>;
-  private previous: Date;
-  private loopEvent: any;
+  private readonly _objects: Array<{object: GameObject, index:number}>;
+  private _active: boolean;
+  private _visible: boolean;
 
   constructor() {
-    this._subject = new Array<{subject: Subject, index:number}>()
-    this.previous = new Date();
-  }
-  
-  private render(): void {
-    this._subject.forEach((subject) => subject.subject.render());
+    this._objects = new Array<{object: GameObject, index:number}>()
+    this._active = true;
   }
 
-  private clear(): void {
-    let canvas = Game.getInstance().getCanvas();
-    Game.getInstance().getCtx().clearRect(0, 0, canvas.width, canvas.height);
+  public addObject(object: GameObject, index: number): void {
+    this._objects.push({object: object, index: index});
   }
 
-  public add(subject: Subject, index: number): void {
-    let insertIndex = this._subject.findIndex((subject) => subject.index > index);
-    if (insertIndex == -1) {
-      this._subject.push({subject: subject, index: index});
-    } else {
-      let splice = this._subject.splice(insertIndex, this._subject.length - insertIndex);
-      this._subject.push({subject: subject, index: index});
-      this._subject.push(...splice);
-    }
-  }
-
-  public remove(subject: Subject): void {
-    const index = this._subject.findIndex((ele) => {
-      return ele.subject == subject});
+  public remove(object: GameObject): void {
+    const index = this._objects.findIndex((ele) => {
+      return ele.object == object});
     if (index > -1) {
-      this._subject.splice(index, 1);
+      this._objects.splice(index, 1);
     }
   }
 
   public removeByName(name: String): void {
-    const index = this._subject.findIndex((ele) => {
-      return ele.subject.getName() == name});
+    const index = this._objects.findIndex((ele) => {
+      return ele.object.getName() == name});
     if (index > -1) {
-      this._subject.splice(index, 1);
+      this._objects.splice(index, 1);
     }
   }
 
   public removeAll(): void {
-    this._subject.splice(0, this._subject.length);
+    this._objects.splice(0, this._objects.length);
   }
 
-  public processInput(): void {
+  public getAllVisibleObjects(): Array<any> {
+    let visibleObjects = this._objects.filter((ele) => {
+      return ele.object.isVisible();
+    });
 
-  }
+    let sortedObjects = visibleObjects.sort((a, b) => {
+      return a.index < b.index ? -1 : 0;
+    });
 
-  public start() {
-    this.update(0);
+    let sortedObjetsReduce: Array<GameObject> = sortedObjects.map((ele) : GameObject => ele.object);
+
+    return sortedObjetsReduce;
   }
 
   public update(dt: number): void {
-    let current = new Date();
-    let elapsed = (current.getTime() - this.previous.getTime()) / 1000;
-    this.previous = current;
-
-    this.processInput();
-    this._subject.forEach((subject) => {
-      subject.subject.update(elapsed);
-      subject.subject.runAction(elapsed);
-    } );
-    this.clear();
-    this.render();
-    this.loopEvent = window.requestAnimationFrame(() => this.update(dt));
+    this._objects.forEach(element => {
+      element.object.update(dt);
+    });
+  }
+  
+  public isActive(): boolean {
+    return this._active;
+  }
+  public setActive(value: boolean) {
+    this._active = value;
+  }
+  
+  public isVisible(): boolean {
+    return this._visible;
+  }
+  
+  public setVisible(value: boolean) {
+    this._visible = value;
   }
 
-  public stop(): void {
-    window.cancelAnimationFrame(this.loopEvent);
-  }
-
-
-  public checkClick(vec: Vec2): Subject {
-    for (let i = this._subject.length - 1; i >=0 ; i--) {
-      if (this._subject[i].subject.checkClick(vec)) {
-        return this._subject[i].subject;
-      }
-    }
-    return null;
-  } 
 }

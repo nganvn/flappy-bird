@@ -2,22 +2,22 @@
 declare var require: any;
 var styles = require('./css/app.css');
 
-import Game from './engine/game';
-import MyScene from './engine/myscene';
-import ImageLoading from './engine/imageloading';
-import { CONSTANT } from './engine/constant';
+import ImageLoading from './game/imageloading';
+import { CONSTANT } from './game/constant';
+import GameController from './engine/gamecontroller/gamecontroller';
+import GameplayScene from './game/scenes/gameplay';
 
 
 function setup(): void {
-	// preloading image
-	preloadingimage();
+	let canvas = <HTMLCanvasElement>document.getElementById('canvas');
+	canvas.width = 288;
+	canvas.height = 512;
 
-	let game = Game.getInstance();
+	let gameController = GameController.getInstance();
+	let gamePlay = GameplayScene.create();
+	gameController.runWithScene(gamePlay);
+	gameController.start();
 
-	let scene = new MyScene()
-	scene.initAwaitScreen();
-
-	game.runWithSence(scene);
 }
 
 function preloadingimage() {
@@ -34,6 +34,7 @@ function preloadingimage() {
 	imageLoading.push(CONSTANT.CLOUD, './sprites/cloud.png');
 }
 
+preloadingimage();
 window.onload = () => {
 	setup();
 }

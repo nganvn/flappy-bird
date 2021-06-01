@@ -1,5 +1,3 @@
-import { Size } from './utils';
-
 export default class ImageLoading {
   private static instance: ImageLoading;
 
