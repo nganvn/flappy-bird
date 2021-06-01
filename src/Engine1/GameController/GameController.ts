@@ -1,6 +1,6 @@
-import Scene from '../scene';
-import Renderer from '../renderer/renderer';
-import EventHandler from '../eventhandler/eventhandler';
+import Scene from '../Scene';
+import Renderer from '../Renderer/Renderer';
+import EventHandler from '../EventHandler/EventHandler';
 export default class GameController{
   private static _instance: GameController;
   

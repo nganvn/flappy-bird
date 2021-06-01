@@ -1,5 +1,5 @@
-import Action from './action';
-import { Vec2, size } from '../utils';
+import Action from './Action';
+import { Vec2, size } from '../Utils';
 export default class Sequence extends Action {
   private readonly _actions: Array<Action>;
 

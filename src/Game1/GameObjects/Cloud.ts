@@ -1,7 +1,7 @@
 
-import Sprite from '../../engine/gameobject/sprite';
-import { CONSTANT } from '../constant';
-import ImageLoading from '../imageloading';
+import Sprite from '../../Engine/GameObject/Sprite';
+import { CONSTANT } from '../CONSTANT';
+import ImageLoading from '../ImageLoading';
 export default class Cloud extends Sprite {
   public static create(): Cloud {
     let cloud = new Cloud();

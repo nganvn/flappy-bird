@@ -1,8 +1,8 @@
-import RenderableObject from '../base/renderableobject';
-import Rectangle from '../gameobject/rectangle';
-import { Size } from '../utils';
-import Label from '../gameobject/label';
-import Sprite from '../gameobject/sprite';
+import RenderableObject from '../Base/RenderableObject';
+import Rectangle from '../GameObject/Rectangle';
+import { Size } from '../Utils';
+import Label from '../GameObject/Label';
+import Sprite from '../GameObject/Sprite';
 
 export default class Renderer {
   private ctx: CanvasRenderingContext2D;

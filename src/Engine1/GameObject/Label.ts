@@ -1,4 +1,4 @@
-import RenderableObject from '../base/renderableobject';
+import RenderableObject from '../Base/RenderableObject';
 export default class Label extends RenderableObject {
   public readonly type: string = Label.name; 
   protected text: string = '';

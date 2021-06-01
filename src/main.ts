@@ -2,10 +2,10 @@
 declare var require: any;
 var styles = require('./css/app.css');
 
-import ImageLoading from './game/imageloading';
-import { CONSTANT } from './game/constant';
-import GameController from './engine/gamecontroller/gamecontroller';
-import GameplayScene from './game/scenes/gameplay';
+import ImageLoading from './Game1/ImageLoading';
+import { CONSTANT } from './Game1/CONSTANT';
+import GameController from './Engine1/GameController/GameController';
+import GameplayScene from './Game1/Scenes/GameplayScene';
 
 
 function setup(): void {

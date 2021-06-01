@@ -1,7 +1,6 @@
-import Sprite from '../../engine/gameobject/sprite';
-import ImageLoading from '../imageloading';
-import { CONSTANT } from '../constant';
-import { size } from '../../engine/utils';
+import Sprite from '../../Engine1/GameObject/Sprite';
+import ImageLoading from '../ImageLoading';
+import { CONSTANT } from '../CONSTANT';
 export default class Ground extends Sprite {
   
   public static create(): Ground {

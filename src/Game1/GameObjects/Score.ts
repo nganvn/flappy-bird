@@ -1,4 +1,4 @@
-import Label from '../../engine/gameobject/label';
+import Label from '../../Engine1/GameObject/Label';
 export default class Score extends Label {
   private score: number = 0;
 

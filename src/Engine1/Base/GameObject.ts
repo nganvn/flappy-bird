@@ -1,5 +1,5 @@
-import Action from '../action/action';
-import { Vec2, v2 } from '../utils';
+import Action from '../Action/Action';
+import { Vec2, v2 } from '../Utils';
 
 export default abstract class GameObject {
   protected name: string = '';

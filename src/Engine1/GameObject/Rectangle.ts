@@ -1,5 +1,5 @@
-import RenderableObject from '../base/renderableobject';
-import { Size, size } from '../utils';
+import RenderableObject from '../Base/RenderableObject';
+import { Size, size } from '../Utils';
 export default class Rectangle extends RenderableObject {
   public readonly type: string = Rectangle.name;
 

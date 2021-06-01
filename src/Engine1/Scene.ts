@@ -1,4 +1,4 @@
-import GameObject from './base/gameobject';
+import GameObject from './Base/GameObject';
 
 export default class Scene {
   private readonly _objects: Array<{object: GameObject, index:number}>;

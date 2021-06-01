@@ -1,4 +1,4 @@
-import { Vec2, v2 } from '../utils';
+import { Vec2, v2 } from '../Utils';
 export default class Action {
   private vec: Vec2;
   private timer: number;

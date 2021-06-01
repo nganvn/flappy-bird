@@ -1,5 +1,5 @@
-import RenderableObject from '../base/renderableobject';
-import { size, Size } from '../utils';
+import RenderableObject from '../Base/RenderableObject';
+import { size, Size } from '../Utils';
 export default class Sprite extends RenderableObject {
   public type: string = Sprite.name;;
 
